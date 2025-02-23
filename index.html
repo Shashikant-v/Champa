@@ -2,495 +2,218 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>My Profile</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometric Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #ff4757;
+            --secondary: #2ed573;
+            --flash: #fffa65;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
-            display: flex;
-            flex-direction: column;
             min-height: 100vh;
-            background: #f5f5f5;
+            background: #1e272e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
         }
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
+
+        .double-square {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            animation: rotateHue 5s infinite linear;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: rotate(45deg);
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .double-square::before {
+            content: '';
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            background: #1e272e;
+            transform: rotate(-45deg);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        @keyframes rotateHue {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        .container {
+            position: absolute;
+            width: 300px;
+            padding: 40px;
+            z-index: 1;
+            transform: rotate(-45deg);
+        }
+
+        .avatar-container {
+            width: 120px;
+            height: 120px;
+            margin: -90px auto 30px;
+            position: relative;
+            border-radius: 50%;
+            border: 3px solid var(--flash);
+            padding: 3px;
+            cursor: pointer;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,250,101,0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(255,250,101,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,250,101,0); }
+        }
+
+        .avatar {
             width: 100%;
             height: 100%;
-            background: #6200ea;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            transition: opacity 0.5s;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #ffffff;
         }
-        #loading-screen.hidden { opacity: 0; pointer-events: none; }
-        #login-screen, #main-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 16px;
-            flex-grow: 1;
-            background: #fff;
+
+        .form-group {
+            margin: 25px 0;
+            position: relative;
         }
-        #login-screen { display: flex; }
-        #main-screen { display: none; }
-        .header {
+
+        .input-field {
             width: 100%;
-            padding: 16px;
-            background: #6200ea;
-            color: #fff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            position: fixed;
-            top: 0;
-            z-index: 10;
+            padding: 15px 40px 15px 20px;
+            border: none;
+            background: rgba(255,255,255,0.9);
+            border-radius: 25px;
+            font-size: 16px;
+            transition: 0.3s;
+            color: #1e272e;
         }
-        .header h3 { font-size: 20px; font-weight: 500; }
-        .window {
+
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 15px var(--flash);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .submit-btn {
             width: 100%;
-            max-width: 360px;
-            margin-top: 64px;
-            margin-bottom: 64px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 16px;
+            padding: 15px;
+            border: none;
+            background: var(--flash);
+            color: #1e272e;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
             position: relative;
             overflow: hidden;
-            background: #fff;
         }
-        .window-image {
+
+        .submit-btn:hover {
+            letter-spacing: 2px;
+            box-shadow: 0 0 20px var(--flash);
+        }
+
+        #photo-input {
+            display: none;
+        }
+
+        .flash-border {
             position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            opacity: 0.7;
-            z-index: 0;
+            border: 2px solid var(--flash);
+            animation: borderFlash 1s infinite;
         }
-        .profile-container {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            padding: 8px;
-            z-index: 1;
-            margin-bottom: 8px;
-        }
-        .profile-card {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            margin-left: 8px;
-        }
-        .profile-photo { width: 100%; height: 100%; object-fit: cover; }
-        #window-user-name {
-            font-size: 18px;
-            font-weight: 500;
-            color: #fff;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            margin-right: 8px;
-            text-align: right;
-            flex-grow: 1;
-        }
-        .footer {
-            width: 100%;
-            padding: 8px;
-            background: #6200ea;
-            color: #fff;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            box-shadow: 0 -2px 4px rgba(0,0,0,0.2);
-            position: fixed;
-            bottom: 0;
-            z-index: 10;
-        }
-        .footer button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 24px;
-            background: #fff;
-            color: #6200ea;
-            font-weight: 500;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .footer button:hover { background: #e0e0e0; }
-        #edit-profile { display: none; margin-top: 16px; z-index: 1; }
-        #weather, #quote, #greeting, #stats {
-            font-size: 14px;
-            margin: 4px 0;
-            color: #fff;
-            z-index: 1;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            text-align: center;
-            line-height: 1.4;
-        }
-        input, button {
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            width: 100%;
-            max-width: 280px;
-            font-size: 14px;
-        }
-        button {
-            background: #6200ea;
-            color: #fff;
-            border: none;
-            font-weight: 500;
-        }
-        button:hover { background: #3700b3; }
-        #screenshot-preview {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff;
-            padding: 16px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 20;
-            text-align: center;
-        }
-        #screenshot-preview img {
-            max-width: 300px;
-            max-height: 400px;
-            border-radius: 4px;
-        }
-        #screenshot-preview button {
-            margin-top: 8px;
-            width: auto;
+
+        @keyframes borderFlash {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <div id="loading-screen">
-        <h2 style="color: white;">Loading...</h2>
-    </div>
+    <div class="double-square">
+        <div class="flash-border"></div>
+        <div class="container">
+            <div class="avatar-container" onclick="document.getElementById('photo-input').click()">
+                <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="avatar" id="avatar">
+                <input type="file" id="photo-input" accept="image/*">
+            </div>
 
-    <div id="login-screen">
-        <div class="header">
-            <h3>Login</h3>
-        </div>
-        <input type="text" id="user-name" placeholder="Enter your name">
-        <input type="file" id="profile-pic" accept="image/*">
-        <input type="file" id="window-image" accept="image/*" onchange="previewWindowImage()">
-        <button onclick="login()">Login</button>
-    </div>
-
-    <div id="main-screen">
-        <div class="header">
-            <h3>My Profile</h3>
-            <span id="live-clock" style="font-size: 14px;"></span>
-        </div>
-        <div class="window" id="window">
-            <img id="loaded-window-image" class="window-image" alt="Window Image">
-            <div class="profile-container">
-                <h2 id="window-user-name"></h2>
-                <div class="profile-card">
-                    <img id="window-profile-pic" class="profile-photo" alt="Profile">
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="text" class="input-field" id="username" placeholder="Your Name" required>
+                    <i class="fas fa-user input-icon"></i>
                 </div>
-            </div>
-           
-            <div id="edit-profile">
-                <input type="text" id="edit-name" placeholder="New Name">
-                <input type="file" id="edit-pic" accept="image/*">
-                <input type="file" id="edit-window-image" accept="image/*" onchange="updateWindowImage()">
-                <button onclick="saveEdit()">Save</button>
-            </div>
-        </div>
-        <div class="footer">
-            <button onclick="downloadWindow()">Download</button>
-            <button onclick="shareImage()">Share</button>
-            <button onclick="changeBackground()">Next</button>
-            <button onclick="showQR()">Donate</button>
-        </div>
-        <div id="screenshot-preview">
-            <h3>Screenshot</h3>
-            <img id="screenshot-img" alt="Screenshot Preview">
-            <button onclick="saveScreenshot()">Save</button>
-            <button onclick="closeScreenshot()">Close</button>
+
+                <button type="submit" class="submit-btn">
+                    Save Profile
+                </button>
+            </form>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
-        let userName = '';
-        let profilePicBase64 = '';
-        let windowImageBase64 = '';
-        let loginCount = parseInt(localStorage.getItem('loginCount')) || 0;
-        let lastLogin = localStorage.getItem('lastLogin') || 'Never';
-        
-        const defaultImages = [
-            'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0',
-            'https://images.unsplash.com/photo-1519681393784-d120267933ba',
-            'https://images.unsplash.com/photo-1490730141103-6cac27aaab94'
-        ];
+        // Handle image upload
+        document.getElementById('photo-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatar').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
 
-        setTimeout(() => document.getElementById('loading-screen').classList.add('hidden'), 1000);
-
-        function login() {
-            userName = document.getElementById('user-name').value.trim();
-            const profilePicInput = document.getElementById('profile-pic');
-            const windowImageInput = document.getElementById('window-image');
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            if (!userName || !profilePicInput.files[0]) {
-                alert('Please enter your name and upload a profile photo!');
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                profilePicBase64 = e.target.result;
-                localStorage.setItem('profilePic', profilePicBase64);
-                if (windowImageInput.files[0]) {
-                    loadWindowImage(windowImageInput.files[0]);
-                } else {
-                    finishLogin();
-                }
-            };
-            reader.readAsDataURL(profilePicInput.files[0]);
-        }
+            const username = document.getElementById('username').value;
+            const avatar = document.getElementById('avatar').src;
 
-        function loadWindowImage(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                windowImageBase64 = e.target.result;
-                localStorage.setItem('windowImage', windowImageBase64);
-                finishLogin();
-            };
-            reader.readAsDataURL(file);
-        }
+            localStorage.setItem('username', username);
+            localStorage.setItem('avatar', avatar);
 
-        function finishLogin() {
-            loginCount++;
-            lastLogin = new Date().toLocaleString();
-            localStorage.setItem('userName', userName);
-            localStorage.setItem('loginCount', loginCount);
-            localStorage.setItem('lastLogin', lastLogin);
-            showMainScreen();
-        }
+            alert('Profile saved successfully!');
+        });
 
-        function previewWindowImage() {
-            const fileInput = document.getElementById('window-image');
-            if (fileInput.files[0]) {
-                loadWindowImage(fileInput.files[0]);
-            }
-        }
-
-        function showMainScreen() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-screen').style.display = 'flex';
-            document.getElementById('window-user-name').innerText = userName;
-            document.getElementById('window-profile-pic').src = profilePicBase64 || 'https://via.placeholder.com/80';
-            document.getElementById('loaded-window-image').src = windowImageBase64 || defaultImages[0];
-            document.getElementById('greeting').innerText = `Hello, ${userName}!`;
-            document.getElementById('weather').innerText = 'Weather: Sunny, 25°C';
-            document.getElementById('stats').innerText = `Logins: ${loginCount} | Last: ${lastLogin}`;
-            showRandomQuote();
-            updateClock();
-            setInterval(updateClock, 1000);
-        }
-
-        function changeBackground() {
-            const randomImage = defaultImages[Math.floor(Math.random() * defaultImages.length)];
-            document.getElementById('loaded-window-image').src = randomImage;
-            windowImageBase64 = randomImage;
-            showRandomQuote();
-        }
-
-        function downloadWindow() {
-            const windowElement = document.getElementById('window');
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-
-            // Higher resolution (3x) for better quality
-            canvas.width = windowElement.offsetWidth * 3;
-            canvas.height = windowElement.offsetHeight * 3;
-            ctx.scale(3, 3);
-
-            // Enable image smoothing for sharper edges
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-
-            // Load images with crossOrigin
-            const bgImage = new Image();
-            bgImage.crossOrigin = 'Anonymous';
-            bgImage.src = document.getElementById('loaded-window-image').src;
-
-            const profileImage = new Image();
-            profileImage.crossOrigin = 'Anonymous';
-            profileImage.src = document.getElementById('window-profile-pic').src;
-
-            Promise.all([
-                new Promise(resolve => bgImage.onload = resolve),
-                new Promise(resolve => profileImage.onload = resolve)
-            ]).then(() => {
-                // Draw background image
-                ctx.globalAlpha = 0.7;
-                ctx.drawImage(bgImage, 0, 0, windowElement.offsetWidth, windowElement.offsetHeight);
-                ctx.globalAlpha = 1.0;
-
-                // Draw profile photo as a circle
-                const profileX = windowElement.offsetWidth - 88;
-                const profileY = 8;
-                const profileRadius = 40; // Half of 80px width/height
-                ctx.save(); // Save current state
-                ctx.beginPath();
-                ctx.arc(profileX + profileRadius, profileY + profileRadius, profileRadius, 0, Math.PI * 2, true);
-                ctx.closePath();
-                ctx.clip(); // Clip to circular path
-                ctx.drawImage(profileImage, profileX, profileY, 80, 80);
-                ctx.restore(); // Restore state to avoid affecting other drawings
-
-                // Draw text with refined shadow
-                ctx.fillStyle = '#fff';
-                ctx.font = '18px Roboto';
-                ctx.textAlign = 'right';
-                ctx.shadowColor = 'rgba(0,0,0,0.6)';
-                ctx.shadowOffsetX = 1.5;
-                ctx.shadowOffsetY = 1.5;
-                ctx.shadowBlur = 3;
-                ctx.fillText(userName, profileX - 8, 48);
-
-                ctx.font = '14px Roboto';
-                ctx.textAlign = 'center';
-                ctx.fillText(document.getElementById('greeting').innerText, windowElement.offsetWidth / 2, 100);
-                ctx.fillText(document.getElementById('weather').innerText, windowElement.offsetWidth / 2, 120);
-                ctx.fillText(document.getElementById('stats').innerText, windowElement.offsetWidth / 2, 140);
-                ctx.fillText(document.getElementById('quote').innerText, windowElement.offsetWidth / 2, 160);
-
-                // Reset shadow
-                ctx.shadowColor = 'transparent';
-
-                // Show preview
-                const preview = document.getElementById('screenshot-preview');
-                const img = document.getElementById('screenshot-img');
-                img.src = canvas.toDataURL('image/png', 1.0);
-
-                try {
-                    canvas.toDataURL('image/png', 1.0);
-                    preview.style.display = 'block';
-                } catch (e) {
-                    alert('Cannot download due to CORS restrictions. Please use uploaded images instead of external URLs.');
-                    console.error('Canvas tainted:', e);
-                }
-            }).catch(err => {
-                alert('Failed to load images. Please try again.');
-                console.error('Image load error:', err);
-            });
-        }
-
-        function saveScreenshot() {
-            const imgSrc = document.getElementById('screenshot-img').src;
-            if (imgSrc) {
-                const link = document.createElement('a');
-                link.href = imgSrc;
-                link.download = 'profile-window.png';
-                link.click();
-                closeScreenshot();
-            } else {
-                alert('No image available to download. Please try again.');
-            }
-        }
-
-        function closeScreenshot() {
-            document.getElementById('screenshot-preview').style.display = 'none';
-        }
-
-        function showQR() {
-            const qrDiv = document.getElementById('qr-code') || document.createElement('div');
-            qrDiv.id = 'qr-code';
-            qrDiv.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);';
-            document.body.appendChild(qrDiv);
-            qrDiv.innerHTML = '';
-            new QRCode(qrDiv, { text: 'https://example.com/donate', width: 128, height: 128 });
-            setTimeout(() => qrDiv.remove(), 5000);
-        }
-
-        function shareImage() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'My Profile',
-                    text: 'Check out my profile!',
-                    url: window.location.href
-                }).catch(err => alert('Share failed: ' + err));
-            } else {
-                alert('Share not supported on this device!');
-            }
-        }
-
-        function toggleEdit() {
-            const editDiv = document.getElementById('edit-profile');
-            editDiv.style.display = editDiv.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function saveEdit() {
-            const newName = document.getElementById('edit-name').value.trim();
-            const newPic = document.getElementById('edit-pic');
-            const newWindowImage = document.getElementById('edit-window-image');
-            if (newName) {
-                userName = newName;
-                localStorage.setItem('userName', userName);
-                document.getElementById('window-user-name').innerText = userName;
-            }
-            if (newPic.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    profilePicBase64 = e.target.result;
-                    localStorage.setItem('profilePic', profilePicBase64);
-                    document.getElementById('window-profile-pic').src = profilePicBase64;
-                };
-                reader.readAsDataURL(newPic.files[0]);
-            }
-            if (newWindowImage.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    windowImageBase64 = e.target.result;
-                    localStorage.setItem('windowImage', windowImageBase64);
-                    document.getElementById('loaded-window-image').src = windowImageBase64;
-                };
-                reader.readAsDataURL(newWindowImage.files[0]);
-            }
-            toggleEdit();
-        }
-
-        function updateWindowImage() {
-            const fileInput = document.getElementById('edit-window-image');
-            if (fileInput.files[0]) {
-                loadWindowImage(fileInput.files[0]);
-            }
-        }
-
-        function showRandomQuote() {
-            const quote = quotes[Math.floor(Math.random() * quotes.length)];
-            document.getElementById('quote').innerText = quote;
-        }
-
-        function updateClock() {
-            document.getElementById('live-clock').innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-
-        if (localStorage.getItem('userName') && localStorage.getItem('profilePic')) {
-            userName = localStorage.getItem('userName');
-            profilePicBase64 = localStorage.getItem('profilePic');
-            windowImageBase64 = localStorage.getItem('windowImage') || defaultImages[0];
-            showMainScreen();
+        // Load saved data
+        window.onload = function() {
+            const savedUsername = localStorage.getItem('username');
+            const savedAvatar = localStorage.getItem('avatar');
+            
+            if (savedUsername) document.getElementById('username').value = savedUsername;
+            if (savedAvatar) document.getElementById('avatar').src = savedAvatar;
         }
     </script>
 </body>
